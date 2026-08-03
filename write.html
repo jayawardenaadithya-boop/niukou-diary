@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>写日记 · 牛口日记</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>写日记</h1>
+  <a class="write-link" href="index.html">← 返回</a>
+</header>
+<main>
+  <details class="settings">
+    <summary>⚙️ 仓库设置（首次填写，只存在你本机浏览器）</summary>
+    <label>GitHub 用户名 <input id="cfg-owner" placeholder="例如 jayawardenaadithya-boop"></label>
+    <label>仓库名 <input id="cfg-repo" placeholder="例如 牛口日记"></label>
+    <label>分支 <input id="cfg-branch" value="main"></label>
+    <label>Personal Access Token <input id="cfg-token" type="password" placeholder="ghp_... 仅存于本机"></label>
+    <button type="button" id="save-cfg">保存设置</button>
+    <p class="hint">Token 需有该仓库的 Contents 写权限（建议用细粒度令牌、设过期时间）。它只存在你自己的浏览器，不会上传到任何地方。</p>
+  </details>
+
+  <form id="diary-form">
+    <label>日期 <input id="f-date" type="date"></label>
+    <label>标题（可空） <input id="f-title" type="text" placeholder="今天发生了什么"></label>
+    <label>正文
+      <textarea id="f-content" rows="12" placeholder="写点什么..."></textarea>
+    </label>
+    <button type="submit">提交到网站</button>
+    <p id="msg"></p>
+  </form>
+</main>
+<script src="write.js"></script>
+</body>
+</html>
