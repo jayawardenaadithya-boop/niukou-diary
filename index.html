@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f1eb" />
+    <title>纽扣的日记 · Private Journal</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="password-gate" id="passwordGate">
+      <div class="gate-inner">
+        <div class="gate-brand" aria-hidden="true">N</div>
+        <p class="eyebrow">PRIVATE NOTEBOOK / ACCESS REQUIRED</p>
+        <h1>纽扣的日记</h1>
+        <p class="gate-copy">这是纽扣留给自己的小房间。<br />输入密码，继续今天的记录。</p>
+        <form class="password-form" id="passwordForm">
+          <label class="password-field">
+            <span class="sr-only">日记密码</span>
+            <input id="passwordInput" type="password" placeholder="输入密码" autocomplete="current-password" required />
+            <button type="submit" aria-label="进入日记">进入 <span aria-hidden="true">↗</span></button>
+          </label>
+          <p class="password-message" id="passwordMessage" role="alert"></p>
+        </form>
+        <p class="gate-footer">只在这台设备上记住进入状态</p>
+      </div>
+    </div>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="回到首页">
+        <span class="brand-mark">M</span>
+        <span class="brand-copy">
+          <strong>纽扣的日记</strong>
+          <small>VISUAL JOURNAL / 01</small>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="主导航">
+        <a class="active" href="#entries">日志</a>
+        <a href="#about">关于</a>
+      </nav>
+      <button class="header-compose" id="composeButton" type="button">
+        <span>写一页</span>
+        <span class="plus-icon" aria-hidden="true">+</span>
+      </button>
+    </header>
+
+    <main id="top">
+      <section class="intro-section" aria-labelledby="introTitle">
+        <div class="intro-copy">
+          <p class="eyebrow">EVERY DAY, A LITTLE TRACE</p>
+          <h1 id="introTitle">写下来痛苦就会过去</h1>
+          <p class="intro-text">每天留下一个画面，一句话，或者一段不急着解释的声音。这里是我的日常日志。</p>
+          <div class="intro-actions">
+            <button class="button button-primary" id="introComposeButton" type="button">写下今天 <span aria-hidden="true">+</span></button>
+            <a class="button button-text" href="#entries">翻看日志 <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+        <aside class="pulse-panel" aria-label="本月记录状态">
+          <div class="pulse-header">
+            <span>本月节奏</span>
+            <strong id="streakValue">04</strong>
+          </div>
+          <div class="pulse-rule"></div>
+          <div class="pulse-meta">
+            <span>连续记录</span>
+            <span>2026 / 08</span>
+          </div>
+          <div class="pulse-bars" aria-hidden="true">
+            <i class="filled"></i><i class="filled"></i><i class="filled"></i><i class="filled"></i><i></i><i></i><i></i>
+          </div>
+          <p>不追求完整，只把今天留在今天。</p>
+        </aside>
+      </section>
+
+      <section class="entries-section" id="entries" aria-labelledby="entriesTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">THE LATEST NOTES</p>
+            <h2 id="entriesTitle">最近的几天 <span id="entryCount">05</span></h2>
+          </div>
+          <div class="entry-tools">
+            <div class="filter-group" role="group" aria-label="筛选日志类型">
+              <button class="filter-button active" type="button" data-filter="all">全部</button>
+              <button class="filter-button" type="button" data-filter="image">图片</button>
+              <button class="filter-button" type="button" data-filter="video">视频</button>
+            </div>
+            <label class="search-box">
+              <span aria-hidden="true">⌕</span>
+              <input id="searchInput" type="search" placeholder="搜索日志" aria-label="搜索日志" />
+            </label>
+          </div>
+        </div>
+
+        <div class="entries-layout">
+          <div class="journal-grid" id="journalGrid" aria-live="polite"></div>
+          <aside class="journal-aside" id="about">
+            <div class="aside-block about-block">
+              <p class="eyebrow">A SMALL ARCHIVE</p>
+              <h3>给自己留一份<br />不赶时间的档案。</h3>
+              <p>照片会替你记住光线，文字会替你留住当时的心情。日子不必被总结，能够被看见就很好。</p>
+            </div>
+            <div class="aside-block">
+              <div class="aside-label"><span>本月标签</span><span>03</span></div>
+              <div class="tag-list">
+                <button type="button" data-tag="散步"># 散步</button>
+                <button type="button" data-tag="窗边"># 窗边</button>
+                <button type="button" data-tag="周末"># 周末</button>
+                <button type="button" data-tag="慢下来"># 慢下来</button>
+              </div>
+            </div>
+            <div class="aside-block month-block">
+              <div class="aside-label"><span>目录</span><span>2026</span></div>
+              <div class="month-list">
+                <button class="current" type="button">08 <span>August</span><b>05</b></button>
+                <button type="button">07 <span>July</span><b>12</b></button>
+                <button type="button">06 <span>June</span><b>08</b></button>
+              </div>
+            </div>
+            <div class="aside-footer">
+              <span>© 2026</span>
+              <span>KEEPING A TRACE</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>纽扣的日记 / VISUAL JOURNAL</span>
+      <span>每天写点，慢慢长出自己的形状。</span>
+    </footer>
+
+    <div class="modal-backdrop" id="composeModal" hidden>
+      <section class="compose-modal" role="dialog" aria-modal="true" aria-labelledby="composeTitle">
+        <button class="close-button" id="closeCompose" type="button" aria-label="关闭">×</button>
+        <p class="eyebrow">NEW ENTRY</p>
+          <h2 id="composeTitle">写下今天</h2>
+        <form id="composeForm">
+          <div class="form-row">
+            <label>
+              <span>日期</span>
+              <input id="entryDate" name="date" type="date" required />
+            </label>
+            <label>
+              <span>标签</span>
+              <input id="entryTag" name="tag" type="text" placeholder="例如：散步" maxlength="18" />
+            </label>
+          </div>
+          <label>
+            <span>页面语句</span>
+            <input id="entryTitle" name="title" type="text" placeholder="写下这一页想留下的句子" maxlength="42" required />
+          </label>
+          <label>
+            <span>今天发生了什么</span>
+            <textarea id="entryNote" name="note" rows="5" placeholder="写下一点当时的光线、声音，或者心情。" maxlength="300" required></textarea>
+          </label>
+          <label class="file-drop" for="entryMedia">
+            <span class="file-drop-icon" aria-hidden="true">↗</span>
+            <span><strong>添加图片或视频</strong><small id="fileName">支持本地文件，单个不超过 8 MB</small></span>
+            <input id="entryMedia" name="media" type="file" accept="image/*,video/*" />
+          </label>
+          <div class="form-actions">
+            <button class="button button-text" id="cancelCompose" type="button">先不写了</button>
+            <button class="button button-primary" type="submit"><span id="composeSubmitText">保存这一页</span> <span aria-hidden="true">↗</span></button>
+          </div>
+          <p class="form-message" id="formMessage" role="status"></p>
+        </form>
+      </section>
+    </div>
+
+    <div class="lightbox-backdrop" id="lightbox" hidden>
+      <section class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+        <button class="close-button lightbox-close" id="closeLightbox" type="button" aria-label="关闭">×</button>
+        <div class="lightbox-media" id="lightboxMedia"></div>
+        <div class="lightbox-copy">
+          <p class="eyebrow" id="lightboxDate"></p>
+          <h2 id="lightboxTitle"></h2>
+          <p id="lightboxNote"></p>
+        </div>
+      </section>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
