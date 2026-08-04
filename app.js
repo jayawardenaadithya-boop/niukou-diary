@@ -5,6 +5,94 @@ const OVERRIDES_KEY = "button-journal-overrides-v2";
 const JOURNAL_PASSWORD = "NIUKOU2026";
 const videoSource = "https://storage.googleapis.com/coverr-main/mp4/Mt_Baker.mp4";
 
+// ===== 云端同步（GitHub Contents API） =====
+const GH_API = "https://api.github.com";
+let cloudSha = null;
+function loadGh() {
+  return {
+    owner: localStorage.getItem("diary_gh_owner") || "jayawardenaadithya-boop",
+    repo: localStorage.getItem("diary_gh_repo") || "niukou-diary",
+    branch: localStorage.getItem("diary_gh_branch") || "main",
+    token: localStorage.getItem("diary_gh_token") || ""
+  };
+}
+function saveGh(cfg) {
+  localStorage.setItem("diary_gh_owner", cfg.owner);
+  localStorage.setItem("diary_gh_repo", cfg.repo);
+  localStorage.setItem("diary_gh_branch", cfg.branch);
+  localStorage.setItem("diary_gh_token", cfg.token);
+}
+function ghB64(str) { return btoa(unescape(encodeURIComponent(str))); }
+function ghB64d(str) { return decodeURIComponent(escape(atob(str))); }
+async function fetchCloudEntries() {
+  const cfg = loadGh();
+  if (!cfg.token || !cfg.owner || !cfg.repo) return;
+  try {
+    const url = `${GH_API}/repos/${cfg.owner}/${cfg.repo}/contents/data.json?ref=${cfg.branch}`;
+    const headers = { Authorization: "token " + cfg.token, Accept: "application/vnd.github+json" };
+    const res = await fetch(url, { headers });
+    if (!res.ok) return;
+    const data = await res.json();
+    cloudSha = data.sha;
+    const arr = JSON.parse(ghB64d(data.content));
+    const cloudEntries = arr.map((e) => ({
+      id: e.id || ("cloud-" + (e.date || "") + "-" + (e.title || "").replace(/\s+/g, "")),
+      date: e.date || "",
+      title: e.title || "",
+      note: e.note || e.content || "",
+      tag: e.tag || "日常",
+      time: e.time || "",
+      type: e.type || "text",
+      media: e.media || "",
+      localVideo: e.localVideo || "",
+      layout: e.layout || "card-wide"
+    }));
+    const localIds = new Set(userEntries.map((e) => e.id));
+    const toAdd = cloudEntries.filter((e) => !localIds.has(e.id));
+    if (toAdd.length) {
+      userEntries = [...toAdd, ...userEntries];
+      persistArchive();
+      render();
+    }
+  } catch (e) {}
+}
+async function pushCloudEntries() {
+  const cfg = loadGh();
+  if (!cfg.token || !cfg.owner || !cfg.repo) return;
+  try {
+    const url = `${GH_API}/repos/${cfg.owner}/${cfg.repo}/contents/data.json?ref=${cfg.branch}`;
+    const headers = { Authorization: "token " + cfg.token, Accept: "application/vnd.github+json" };
+    let sha = cloudSha;
+    if (!sha) {
+      const r = await fetch(url, { headers });
+      if (r.ok) sha = (await r.json()).sha;
+    }
+    const payload = userEntries.map((e) => ({
+      id: e.id,
+      date: e.date,
+      title: e.title,
+      note: e.note,
+      tag: e.tag || "日常",
+      time: e.time || "",
+      type: e.type || "text",
+      media: (e.media && typeof e.media === "string" && e.media.startsWith("data:")) ? "" : (e.media || ""),
+      localVideo: (e.localVideo && typeof e.localVideo === "string" && e.localVideo.startsWith("data:")) ? "" : (e.localVideo || ""),
+      layout: e.layout || "card-wide"
+    }));
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "diary sync: " + new Date().toISOString().slice(0, 16),
+        content: ghB64(JSON.stringify(payload, null, 2)),
+        sha: sha,
+        branch: cfg.branch
+      })
+    });
+    if (res.ok) { const d = await res.json(); cloudSha = d.content.sha; }
+  } catch (e) {}
+}
+
 const demoEntries = [
   {
     id: "demo-0803",
@@ -82,6 +170,7 @@ const passwordInput = document.querySelector("#passwordInput");
 const passwordMessage = document.querySelector("#passwordMessage");
 
 let userEntries = readEntries();
+fetchCloudEntries();
 let deletedEntryIds = readDeletedEntryIds();
 let entryOverrides = readEntryOverrides();
 let editingId = null;
@@ -324,6 +413,7 @@ function deleteEntry(id) {
     return;
   }
   render();
+  pushCloudEntries();
   showToast("这一页已经从日志里移除了");
 }
 
@@ -422,7 +512,7 @@ composeForm.addEventListener("submit", (event) => {
       }
     } else {
       userEntries = [{
-        id: `local-${Date.now()}`,
+        id: `e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         ...entryFields,
         type,
         media,
@@ -437,6 +527,7 @@ composeForm.addEventListener("submit", (event) => {
     }
     closeCompose();
     render();
+    pushCloudEntries();
     showToast(currentEditingId ? "这一页已经更新" : "这一页已经收进日志里了");
     document.querySelector("#entries").scrollIntoView({ behavior: "smooth" });
   };
@@ -448,5 +539,45 @@ composeForm.addEventListener("submit", (event) => {
   reader.addEventListener("load", () => saveEntry(reader.result, file.type.startsWith("video/") ? "video" : "image", file.type.startsWith("video/") ? reader.result : ""));
   reader.readAsDataURL(file);
 });
+
+// ===== 云端同步设置 UI =====
+(function setupSyncUI() {
+  const syncModal = document.querySelector("#syncModal");
+  const syncOpen = document.querySelector("#syncOpen");
+  if (!syncModal || !syncOpen) return;
+  syncOpen.addEventListener("click", (e) => {
+    e.preventDefault();
+    const c = loadGh();
+    document.querySelector("#syncOwner").value = c.owner;
+    document.querySelector("#syncRepo").value = c.repo;
+    document.querySelector("#syncBranch").value = c.branch;
+    document.querySelector("#syncToken").value = c.token;
+    syncModal.hidden = false;
+    document.body.classList.add("modal-open");
+  });
+  const closeSync = () => { syncModal.hidden = true; document.body.classList.remove("modal-open"); };
+  document.querySelector("#closeSync").addEventListener("click", closeSync);
+  document.querySelector("#cancelSync").addEventListener("click", closeSync);
+  syncModal.addEventListener("click", (ev) => { if (ev.target === syncModal) closeSync(); });
+  document.querySelector("#syncForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    saveGh({
+      owner: document.querySelector("#syncOwner").value.trim(),
+      repo: document.querySelector("#syncRepo").value.trim(),
+      branch: document.querySelector("#syncBranch").value.trim() || "main",
+      token: document.querySelector("#syncToken").value.trim()
+    });
+    document.querySelector("#syncMsg").textContent = "已保存。现在写日记会自动同步到 GitHub。";
+    fetchCloudEntries();
+  });
+  document.querySelector("#syncNow").addEventListener("click", async () => {
+    const msg = document.querySelector("#syncMsg");
+    msg.textContent = "同步中…";
+    await fetchCloudEntries();
+    await pushCloudEntries();
+    render();
+    msg.textContent = "已同步：云端与本机已对齐。";
+  });
+})();
 
 render();

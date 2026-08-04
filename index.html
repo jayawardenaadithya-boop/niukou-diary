@@ -36,6 +36,7 @@
       <nav class="site-nav" aria-label="主导航">
         <a class="active" href="#entries">日志</a>
         <a href="#about">关于</a>
+        <a href="#" id="syncOpen" title="云端同步设置">⚙</a>
       </nav>
       <button class="header-compose" id="composeButton" type="button">
         <span>写一页</span>
@@ -179,6 +180,26 @@
       </section>
     </div>
 
+    <div class="modal-backdrop" id="syncModal" hidden>
+      <section class="compose-modal" role="dialog" aria-modal="true" aria-labelledby="syncTitle">
+        <button class="close-button" id="closeSync" type="button" aria-label="关闭">×</button>
+        <p class="eyebrow">CLOUD SYNC</p>
+        <h2 id="syncTitle">云端同步设置</h2>
+        <form id="syncForm">
+          <label><span>GitHub 用户名</span><input id="syncOwner" type="text" placeholder="jayawardenaadithya-boop" /></label>
+          <label><span>仓库名</span><input id="syncRepo" type="text" placeholder="niukou-diary" /></label>
+          <label><span>分支</span><input id="syncBranch" type="text" placeholder="main" /></label>
+          <label><span>Token（PAT）</span><input id="syncToken" type="password" placeholder="github_pat_..." /></label>
+          <p class="form-hint">Token 只存你浏览器，不上传。需「Contents 读写」权限。</p>
+          <div class="form-actions">
+            <button class="button button-text" id="cancelSync" type="button">关闭</button>
+            <button class="button button-primary" type="submit">保存设置</button>
+          </div>
+        </form>
+        <button class="button button-primary" id="syncNow" type="button" style="margin-top:12px;width:100%;">立即同步一次</button>
+        <p class="form-message" id="syncMsg" role="status"></p>
+      </section>
+    </div>
     <div class="toast" id="toast" role="status"></div>
     <script src="app.js"></script>
   </body>
